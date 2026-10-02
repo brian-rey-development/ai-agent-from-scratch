@@ -15,7 +15,7 @@ from scratch_agents.rag import fixed_length_chunking
 ROOT=Path(__file__).resolve().parents[1]
 
 def cell(ch,index):
-    return ''.join(json.loads(next((ROOT/'notebooks'/ch).glob('*.ipynb')).read_text())['cells'][index-1]['source'])
+    return ''.join(json.loads(next((ROOT/'notebooks').glob(f'{ch}_*.ipynb')).read_text())['cells'][index-1]['source'])
 
 class Model:
     model="offline-test"

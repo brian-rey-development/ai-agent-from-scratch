@@ -18,7 +18,7 @@ from unittest.mock import patch
 
 os.environ['LITELLM_LOCAL_MODEL_COST_MAP'] = 'True'
 os.environ['ANONYMIZED_TELEMETRY'] = 'False'
-for key in ('OPENAI_API_KEY', 'ANTHROPIC_API_KEY', 'TAVILY_API_KEY', 'HF_TOKEN', 'E2B_API_KEY'):
+for key in ('OPENROUTER_API_KEY', 'OPENAI_API_KEY', 'ANTHROPIC_API_KEY', 'TAVILY_API_KEY', 'HF_TOKEN', 'E2B_API_KEY'):
     os.environ[key] = 'offline-notebook-test'
 import dotenv
 dotenv.load_dotenv = lambda *a, **kw: False

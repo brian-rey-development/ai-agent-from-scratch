@@ -13,9 +13,13 @@ from jupyter_client.kernelspec import KernelSpecManager
 import pytest
 
 ROOT=Path(__file__).resolve().parents[1]
-NOTEBOOKS=sorted((ROOT/'notebooks').glob('**/*.ipynb'))
 
-@pytest.mark.parametrize('path',NOTEBOOKS,ids=lambda p:p.parent.name)
+def chapter_of(path):
+    return path.name[:4]
+
+NOTEBOOKS=sorted((ROOT/'notebooks').glob('ch*.ipynb'))
+
+@pytest.mark.parametrize('path',NOTEBOOKS,ids=lambda p:chapter_of(p))
 def test_run_all(path,tmp_path):
     run_notebook(path, tmp_path)
 
@@ -36,10 +40,10 @@ def run_notebook(path, tmp_path, broken_tool=None):
     (spec/'kernel.json').write_text(json.dumps({'argv':[sys.executable,'-m','ipykernel_launcher','-f','{connection_file}'],'display_name':'Notebook regression test','language':'python'}))
     manager=KernelManager(kernel_name='test-python',kernel_spec_manager=KernelSpecManager(kernel_dirs=[str(spec.parent)]))
     nb=nbformat.read(path,as_version=4)
-    if path.parent.name == 'ch08':
+    if chapter_of(path) == 'ch08':
         # Explicit test-only activation of the book's optional live examples.
         import pandas as pd
-        fixture = checkout/'notebooks/ch05/gaia_workspace/7cc4acfa-63fd-4acc-a1a1-e8e529e0a97f.xlsx'
+        fixture = checkout/'notebooks/gaia_workspace/7cc4acfa-63fd-4acc-a1a1-e8e529e0a97f.xlsx'
         fixture.parent.mkdir(parents=True)
         pd.DataFrame({'city':['Wharvton','Wharvton','Algrimand'], 'sales':[100,150,200]}).to_excel(fixture,index=False)
         for index in (34,54,65):
@@ -57,14 +61,14 @@ def run_notebook(path, tmp_path, broken_tool=None):
         'ch08': "assert result.output == 'Wharvton: 250'\nassert result.context.code_env is None\nassert any(e['kind'] == 'upload' and e['bytes'] > 0 for e in SERVICE_EVENTS)\nassert any(e['kind'] == 'command' for e in SERVICE_EVENTS)\nassert any(e['kind'] == 'wikipedia_request' for e in SERVICE_EVENTS)\nassert any(e['kind'] == 'code' and e['text'] == '354224848179261915075' for e in SERVICE_EVENTS)\nassert {'execute_python', 'upload_file', 'bash_tool'} <= {e['name'] for e in SERVICE_EVENTS if e['kind'] == 'tool_request'}",
 
     }
-    if path.parent.name in checks:
-        nb.cells.append(nbformat.v4.new_code_cell(checks[path.parent.name]))
+    if chapter_of(path) in checks:
+        nb.cells.append(nbformat.v4.new_code_cell(checks[chapter_of(path)]))
     client=NotebookClient(nb,km=manager,timeout=90,allow_errors=False,resources={'metadata':{'path':str(chapter)}})
     try:
         client.execute(cwd=str(chapter))
     finally:
         # Save evidence even on failure; pytest's tmp_path location is in its output.
-        nbformat.write(nb,tmp_path/f'{path.parent.name}-executed.ipynb')
+        nbformat.write(nb,tmp_path/f'{chapter_of(path)}-executed.ipynb')
     errors=[o for c in nb.cells if c.cell_type=='code' for o in c.outputs if o.output_type=='error']
     assert not errors
     assert all(c.execution_count is not None for c in nb.cells if c.cell_type=='code')
@@ -73,6 +77,6 @@ def run_notebook(path, tmp_path, broken_tool=None):
 @pytest.mark.parametrize('broken_tool', ['execute_python', 'upload_file', 'bash_tool'])
 def test_ch08_detects_broken_tools(broken_tool, tmp_path):
     from nbclient.exceptions import CellExecutionError
-    path = next(p for p in NOTEBOOKS if p.parent.name == 'ch08')
+    path = next(p for p in NOTEBOOKS if chapter_of(p) == 'ch08')
     with pytest.raises(CellExecutionError, match=f'INTENTIONALLY BROKEN {broken_tool}'):
         run_notebook(path, tmp_path, broken_tool=broken_tool)

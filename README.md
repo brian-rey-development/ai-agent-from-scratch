@@ -22,16 +22,10 @@ scratch_agents/          # Final package (complete through CH10)
   workflows/            # Sequential, Parallel, Loop
   eval/                 # GAIA benchmark, evaluation prompts
 
-notebooks/              # Chapter notebooks
-  ch02/                 # LLM API Basics
-  ch03/                 # Tools and Function Calling
-  ch04/                 # ReAct Agent (+ chapter snapshot code)
-  ch05/                 # RAG and File Tools (+ chapter snapshot code)
-  ch06/                 # Memory Systems (+ chapter snapshot code)
-  ch07/                 # Planning and Reflection
-  ch08/                 # Code Execution (+ chapter snapshot code)
-  ch09/                 # Multi-Agent Systems (+ chapter snapshot code)
-  ch10/                 # Evaluation
+notebooks/              # Chapter notebooks, all in one folder
+  00_openrouter_setup.ipynb          # LiteLLM + OpenRouter smoke test
+  ch02_llm_api_basics.ipynb ... ch10_evaluation.ipynb
+  ch04/ ch05/ ch06/ ch08/ ch09/      # chapter snapshot code (.py only)
 ```
 
 ## Setup
@@ -90,7 +84,7 @@ These examples make real, potentially billable requests. CH02 includes a
 example counts when doing a quick live check. Model IDs are examples and require
 access from your provider account.
 
-CH05 creates `notebooks/ch05/gaia_workspace` and resets its contents for the
+CH05 creates `notebooks/gaia_workspace` and resets its contents for the
 attachment exercise; do not keep personal files there. CH06 creates its own
 throwaway deletion target, and CH08 uses the GAIA spreadsheet prepared in CH05.
 
@@ -123,7 +117,7 @@ explanation. They are not standalone programs.
 
 To run CH08's three optional agent examples, uncomment their calls after setting
 up the required API keys. The Excel example also requires
-`7cc4acfa-63fd-4acc-a1a1-e8e529e0a97f.xlsx` in `notebooks/ch05/gaia_workspace`,
+`7cc4acfa-63fd-4acc-a1a1-e8e529e0a97f.xlsx` in `notebooks/gaia_workspace`,
 prepared using the CH05 attachment workflow.
 
 If a parallel workflow has failed or is awaiting approval, it raises
